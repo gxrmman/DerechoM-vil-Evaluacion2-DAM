@@ -14,15 +14,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+
 val AzulFondoApp = Color(0xFF0F2646)
 
 @Composable
-fun LoginScreen() {
-
+fun LoginScreen(
+    onLoginSuccess: () -> Unit = {}
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -88,7 +86,7 @@ fun LoginScreen() {
             Spacer(modifier = Modifier.height(28.dp))
 
             Button(
-                onClick = {},
+                onClick = onLoginSuccess,
                 shape = RoundedCornerShape(24.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
