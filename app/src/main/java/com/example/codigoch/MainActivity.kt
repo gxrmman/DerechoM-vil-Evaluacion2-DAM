@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
+import com.example.codigoch.ui.MainContainer
+import com.example.codigoch.ui.theme.CodigoCHTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,14 +14,21 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            // Estado para saber qué pantalla mostrar
-            var currentScreen by remember { mutableStateOf("welcome") }
+            CodigoCHTheme {
+                // Estado para saber qué pantalla mostrar
+                var currentScreen by remember { mutableStateOf("welcome") }
 
-            when (currentScreen) {
-                "welcome" -> WelcomeScreen(
-                    onNavigateToLogin = { currentScreen = "login" }
-                )
-                "login" -> LoginScreen()
+                when (currentScreen) {
+                    "welcome" -> WelcomeScreen(
+                        onNavigateToLogin = { currentScreen = "login" }
+                    )
+                    "login" -> LoginScreen(
+                        onLoginSuccess = { currentScreen = "main" }
+                    )
+                    "main" -> MainContainer(
+                        onLogout = { currentScreen = "login" }
+                    )
+                }
             }
         }
     }
