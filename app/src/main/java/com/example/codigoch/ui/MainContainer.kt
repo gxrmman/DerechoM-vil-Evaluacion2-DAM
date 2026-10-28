@@ -30,11 +30,22 @@ sealed class NavigationTab(val route: String, val title: String, val selectedIco
 
 @Composable
 fun MainContainer(
+    userEmail: String = "",
     onLogout: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf<NavigationTab>(NavigationTab.Inicio) }
     var selectedDerecho by remember { mutableStateOf<Derecho?>(null) }
     var showSupportScreen by remember { mutableStateOf(false) }
+
+    val displayEmail = if (userEmail.isBlank()) "usuario@correo.com" else userEmail
+    val displayUserName = userEmail
+        .substringBefore("@")
+        .split(".", "_", "-")
+        .filter { it.isNotBlank() }
+        .joinToString(" ") { word ->
+            word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        }
+        .ifEmpty { "Usuario" }
 
     // Estado global de la lista de derechos
     var derechosList by remember { mutableStateOf(SampleData.derechosIniciales) }
@@ -116,7 +127,7 @@ fun MainContainer(
                     when (selectedTab) {
                         NavigationTab.Inicio -> {
                             HomeScreen(
-                                userName = "German",
+                                userName = displayUserName,
                                 onSelectCategory = { _ ->
                                     selectedTab = NavigationTab.Catalogo
                                 },

@@ -19,7 +19,7 @@ val AzulFondoApp = Color(0xFF0F2646)
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit = {}
+    onLoginSuccess: (String) -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -86,7 +86,10 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(28.dp))
 
             Button(
-                onClick = onLoginSuccess,
+                onClick = {
+                    val loggedInEmail = if (email.isBlank()) "usuario@correo.com" else email
+                    onLoginSuccess(loggedInEmail)
+                },
                 shape = RoundedCornerShape(24.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
