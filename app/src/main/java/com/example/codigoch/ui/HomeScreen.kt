@@ -30,7 +30,7 @@ val FondoClaro = Color(0xFFF7F9FC)
 
 @Composable
 fun HomeScreen(
-    userName: String = "German",
+    userName: String = "Usuario",
     onSelectCategory: (CategoriaDerecho) -> Unit,
     onNavigateToCatalog: () -> Unit
 ) {

@@ -1,5 +1,6 @@
 package com.example.codigoch
 
+import android.util.Patterns
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +24,7 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Box(
         modifier = Modifier
@@ -52,15 +54,21 @@ fun LoginScreen(
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    email = it
+                    errorMessage = null
+                },
                 label = { Text("Correo electrónico", color = Color.LightGray) },
                 singleLine = true,
+                isError = errorMessage != null && !Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.White,
                     unfocusedBorderColor = Color.Gray,
                     focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
+                    unfocusedTextColor = Color.White,
+                    errorBorderColor = Color(0xFFFF6B6B),
+                    errorLabelColor = Color(0xFFFF6B6B)
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -69,7 +77,10 @@ fun LoginScreen(
 
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    password = it
+                    errorMessage = null
+                },
                 label = { Text("Contraseña", color = Color.LightGray) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
@@ -78,17 +89,43 @@ fun LoginScreen(
                     focusedBorderColor = Color.White,
                     unfocusedBorderColor = Color.Gray,
                     focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
+                    unfocusedTextColor = Color.White,
+                    errorBorderColor = Color(0xFFFF6B6B),
+                    errorLabelColor = Color(0xFFFF6B6B)
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (errorMessage != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = errorMessage!!,
+                    color = Color(0xFFFF6B6B),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
 
             Spacer(modifier = Modifier.height(28.dp))
 
             Button(
                 onClick = {
-                    val loggedInEmail = if (email.isBlank()) "usuario@correo.com" else email
-                    onLoginSuccess(loggedInEmail)
+                    val trimmedEmail = email.trim()
+                    when {
+                        trimmedEmail.isBlank() -> {
+                            errorMessage = "Por favor ingresa tu correo electrónico"
+                        }
+                        !Patterns.EMAIL_ADDRESS.matcher(trimmedEmail).matches() -> {
+                            errorMessage = "Ingresa un correo válido (ej: usuario@correo.com)"
+                        }
+                        password.isBlank() -> {
+                            errorMessage = "Por favor ingresa tu contraseña"
+                        }
+                        else -> {
+                            errorMessage = null
+                            onLoginSuccess(trimmedEmail)
+                        }
+                    }
                 },
                 shape = RoundedCornerShape(24.dp),
                 colors = ButtonDefaults.buttonColors(
