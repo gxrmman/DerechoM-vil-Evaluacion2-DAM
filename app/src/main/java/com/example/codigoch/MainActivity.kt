@@ -17,15 +17,20 @@ class MainActivity : ComponentActivity() {
             CodigoCHTheme {
                 // Estado para saber qué pantalla mostrar
                 var currentScreen by remember { mutableStateOf("welcome") }
+                var userEmail by remember { mutableStateOf("") }
 
                 when (currentScreen) {
                     "welcome" -> WelcomeScreen(
                         onNavigateToLogin = { currentScreen = "login" }
                     )
                     "login" -> LoginScreen(
-                        onLoginSuccess = { currentScreen = "main" }
+                        onLoginSuccess = { email ->
+                            userEmail = email
+                            currentScreen = "main"
+                        }
                     )
                     "main" -> MainContainer(
+                        userEmail = userEmail,
                         onLogout = { currentScreen = "login" }
                     )
                 }
