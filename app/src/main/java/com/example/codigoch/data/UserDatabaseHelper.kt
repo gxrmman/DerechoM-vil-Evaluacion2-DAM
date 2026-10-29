@@ -33,41 +33,61 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         db.execSQL("DROP TABLE IF EXISTS $TABLE_USERS")
         onCreate(db)
     }
-      //Registra o actualiza un usuario en la Base de Datos SQLite y guarda su sesión como activa.
-    fun login(email: String, password: String): Boolean {
+    fun registerUser(email: String, password: String): Boolean {
         val db = writableDatabase
 
-        // Cerrar cualquier sesión previa
-        logoutAll()
-
-        // Verificar si el usuario ya existe
         val cursor = db.query(
             TABLE_USERS,
             arrayOf(COLUMN_ID),
             "$COLUMN_EMAIL = ?",
             arrayOf(email),
-            null, null, null
+            null, null, null,
         )
 
-        val userExists = cursor.moveToFirst()
+        val exists = cursor.moveToFirst()
         cursor.close()
+
+        if (exists) {
+            return false
+        }
 
         val values = ContentValues().apply {
             put(COLUMN_EMAIL, email)
             put(COLUMN_PASSWORD, password)
+            put(COLUMN_IS_LOGGED_IN, 0)
+        }
+
+        val id = db.insert(TABLE_USERS, null, values)
+        return id != -1L
+    }
+    fun login(email: String, password: String): Boolean {
+        val db = writableDatabase
+
+        val cursor = db.query(
+            TABLE_USERS,
+            arrayOf(COLUMN_EMAIL),
+            "$COLUMN_EMAIL = ? AND $COLUMN_PASSWORD = ?",
+            arrayOf(email, password),
+            null, null, null,
+        )
+
+        val userFound = cursor.moveToFirst()
+        cursor.close()
+
+        if (!userFound) {
+            return false
+        }
+
+        logoutAll()
+
+        val values = ContentValues().apply {
             put(COLUMN_IS_LOGGED_IN, 1)
         }
 
-        return if (userExists) {
-            val result = db.update(TABLE_USERS, values, "$COLUMN_EMAIL = ?", arrayOf(email))
-            result > 0
-        } else {
-            val result = db.insert(TABLE_USERS, null, values)
-            result != -1L
-        }
+        val updated = db.update(TABLE_USERS, values, "$COLUMN_EMAIL = ?", arrayOf(email))
+        return updated > 0
     }
 
-    // Obtiene el correo del usuario que tiene la sesión activa guardada en la BD.
     fun getActiveSessionUser(): String? {
         val db = readableDatabase
         val cursor = db.query(
@@ -75,7 +95,7 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
             arrayOf(COLUMN_EMAIL),
             "$COLUMN_IS_LOGGED_IN = ?",
             arrayOf("1"),
-            null, null, null
+            null, null, null,
         )
 
         var email: String? = null
@@ -85,7 +105,6 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         cursor.close()
         return email
     }
-    //Cierra todas las sesiones activas en la Base de Datos.
 
     fun logoutAll() {
         val db = writableDatabase
