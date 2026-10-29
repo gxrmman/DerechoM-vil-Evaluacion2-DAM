@@ -31,17 +31,15 @@ class MainActivity : ComponentActivity() {
                 }
 
                 when (currentScreen) {
-                    "welcome" -> WelcomeScreen(
-                        onNavigateToLogin = { currentScreen = "login" },
-                    )
-                    "login" -> LoginScreen(
-                        onLoginSuccess = { email, password ->
-                            // Guardar usuario y sesión en la Base de Datos SQLite
-                            dbHelper.login(email, password)
-                            userEmail = email
-                            currentScreen = "main"
-                        },
-                    )
+                    "welcome" -> WelcomeScreen {
+                        currentScreen = "login"
+                    }
+                    "login" -> LoginScreen { email, password ->
+                        // Guardar usuario y sesión en la Base de Datos SQLite
+                        dbHelper.login(email, password)
+                        userEmail = email
+                        currentScreen = "main"
+                    }
                     "main" -> MainContainer(
                         userEmail = userEmail,
                         onLogout = {
