@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun ProfileScreen(
-    userName: String = "German Pino",
-    userEmail: String = "german@gmail.com",
+    userName: String = "Usuario",
+    userEmail: String = "usuario@correo.com",
     onNavigateToFavorites: () -> Unit,
     onNavigateToSupport: () -> Unit,
     onLogout: () -> Unit

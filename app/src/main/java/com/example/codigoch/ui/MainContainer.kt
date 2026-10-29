@@ -37,7 +37,7 @@ fun MainContainer(
     var selectedDerecho by remember { mutableStateOf<Derecho?>(null) }
     var showSupportScreen by remember { mutableStateOf(false) }
 
-    val displayEmail = if (userEmail.isBlank()) "usuario@correo.com" else userEmail
+    val displayEmail = userEmail.ifBlank { "usuario@correo.com" }
     val displayUserName = userEmail
         .substringBefore("@")
         .split(".", "_", "-")
@@ -161,8 +161,8 @@ fun MainContainer(
 
                         NavigationTab.Perfil -> {
                             ProfileScreen(
-                                userName = "German Pino",
-                                userEmail = "german@gmail.com",
+                                userName = displayUserName,
+                                userEmail = displayEmail,
                                 onNavigateToFavorites = {
                                     selectedTab = NavigationTab.Favoritos
                                 },
