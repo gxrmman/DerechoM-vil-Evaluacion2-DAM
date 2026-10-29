@@ -13,27 +13,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-
 @Composable
 fun WelcomeScreen(
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    onNavigateToRegister: () -> Unit = onNavigateToLogin,
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(AzulFondoApp)
-            .padding(24.dp)
+            .padding(24.dp),
     ) {
-        // Contenido centrado (Logo y Títulos)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = "⚖️",
-                fontSize = 64.sp
+                fontSize = 64.sp,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -42,7 +41,7 @@ fun WelcomeScreen(
                 text = "Tus Derechos",
                 color = Color.White,
                 fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -51,33 +50,32 @@ fun WelcomeScreen(
                 text = "Infórmate, conoce y ejerce\ntus derechos",
                 color = Color.LightGray,
                 fontSize = 16.sp,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
 
-        // Botones en la parte inferior
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Button(
-                onClick = onNavigateToLogin,
+                onClick = onNavigateToRegister,
                 shape = RoundedCornerShape(24.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
-                    contentColor = AzulFondoApp
+                    contentColor = AzulFondoApp,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(50.dp),
             ) {
                 Text(
-                    text = "Comenzar",
+                    text = "Crear Cuenta",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
                 )
             }
 
@@ -87,7 +85,7 @@ fun WelcomeScreen(
                 Text(
                     text = "Ya tengo una cuenta",
                     color = Color.White,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
                 )
             }
         }

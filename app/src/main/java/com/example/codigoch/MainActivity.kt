@@ -26,26 +26,37 @@ class MainActivity : ComponentActivity() {
                 var currentScreen by remember {
                     mutableStateOf(if (activeUser != null) "main" else "welcome")
                 }
+                var initialIsRegister by remember { mutableStateOf(value = false) }
                 var userEmail by remember {
                     mutableStateOf(activeUser ?: "")
                 }
 
                 when (currentScreen) {
-                    "welcome" -> WelcomeScreen {
-                        currentScreen = "login"
-                    }
-                    "login" -> LoginScreen { email, password ->
-                        // Guardar usuario y sesión en la Base de Datos SQLite
-                        dbHelper.login(email, password)
-                        userEmail = email
-                        currentScreen = "main"
-                    }
+                    "welcome" -> WelcomeScreen(
+                        onNavigateToLogin = {
+                            initialIsRegister = false
+                            currentScreen = "login"
+                        },
+                        onNavigateToRegister = {
+                            initialIsRegister = true
+                            currentScreen = "login"
+                        },
+                    )
+                    "login" -> LoginScreen(
+                        dbHelper = dbHelper,
+                        initialIsRegister = initialIsRegister,
+                        onLoginSuccess = { email ->
+                            userEmail = email
+                            currentScreen = "main"
+                        },
+                    )
                     "main" -> MainContainer(
                         userEmail = userEmail,
                         onLogout = {
                             // Cerrar sesión en la Base de Datos SQLite
                             dbHelper.logoutAll()
                             userEmail = ""
+                            initialIsRegister = false
                             currentScreen = "login"
                         },
                     )
