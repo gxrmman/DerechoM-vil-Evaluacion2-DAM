@@ -15,13 +15,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.codigoch.data.UserDatabaseHelper
+import com.example.codigoch.data.repository.UserRepository
 
 val AzulFondoApp = Color(0xFF0F2646)
 
 @Composable
 fun LoginScreen(
-    dbHelper: UserDatabaseHelper,
+    userRepository: UserRepository,
     initialIsRegister: Boolean = false,
     onLoginSuccess: (email: String) -> Unit = {},
 ) {
@@ -210,9 +210,9 @@ fun LoginScreen(
                         } else if (trimmedPassword != confirmPassword.trim()) {
                             errorMessage = "Las contraseñas no coinciden"
                         } else {
-                            val registered = dbHelper.registerUser(trimmedEmail, trimmedPassword)
+                            val registered = userRepository.registerUser(trimmedEmail, trimmedPassword)
                             if (registered) {
-                                dbHelper.login(trimmedEmail, trimmedPassword)
+                                userRepository.login(trimmedEmail, trimmedPassword)
                                 successMessage = "¡Cuenta creada exitosamente!"
                                 errorMessage = null
                                 onLoginSuccess(trimmedEmail)
@@ -224,7 +224,7 @@ fun LoginScreen(
                         if (trimmedEmail.isBlank() || trimmedPassword.isBlank()) {
                             errorMessage = "Ingresa tu correo y contraseña"
                         } else {
-                            val loggedIn = dbHelper.login(trimmedEmail, trimmedPassword)
+                            val loggedIn = userRepository.login(trimmedEmail, trimmedPassword)
                             if (loggedIn) {
                                 errorMessage = null
                                 onLoginSuccess(trimmedEmail)

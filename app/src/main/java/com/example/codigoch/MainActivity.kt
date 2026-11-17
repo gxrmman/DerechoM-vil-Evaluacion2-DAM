@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.codigoch.data.UserDatabaseHelper
+import com.example.codigoch.data.repository.DerechoRepositoryImpl
+import com.example.codigoch.data.repository.UserRepositoryImpl
 import com.example.codigoch.ui.MainContainer
 import com.example.codigoch.ui.theme.CodigoCHTheme
 
@@ -19,9 +21,11 @@ class MainActivity : ComponentActivity() {
             CodigoCHTheme {
                 val context = LocalContext.current
                 val dbHelper = remember { UserDatabaseHelper(context) }
+                val userRepository = remember { UserRepositoryImpl(dbHelper) }
+                val derechoRepository = remember { DerechoRepositoryImpl() }
 
-                // Comprobar si hay una sesión activa guardada en la Base de Datos SQLite
-                val activeUser = remember { dbHelper.getActiveSessionUser() }
+                // Comprobar si hay una sesión activa guardada a través del UserRepository
+                val activeUser = remember { userRepository.getActiveSessionUser() }
 
                 var currentScreen by remember {
                     mutableStateOf(if (activeUser != null) "main" else "welcome")
@@ -43,7 +47,7 @@ class MainActivity : ComponentActivity() {
                         },
                     )
                     "login" -> LoginScreen(
-                        dbHelper = dbHelper,
+                        userRepository = userRepository,
                         initialIsRegister = initialIsRegister,
                         onLoginSuccess = { email ->
                             userEmail = email
@@ -52,9 +56,11 @@ class MainActivity : ComponentActivity() {
                     )
                     "main" -> MainContainer(
                         userEmail = userEmail,
+                        userRepository = userRepository,
+                        derechoRepository = derechoRepository,
                         onLogout = {
-                            // Cerrar sesión en la Base de Datos SQLite
-                            dbHelper.logoutAll()
+                            // Cerrar sesión mediante UserRepository
+                            userRepository.logoutAll()
                             userEmail = ""
                             initialIsRegister = false
                             currentScreen = "login"

@@ -1,5 +1,6 @@
 package com.example.codigoch.ui
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,7 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.codigoch.data.SampleData
+import com.example.codigoch.data.repository.DerechoRepository
+import com.example.codigoch.data.repository.UserRepository
 import com.example.codigoch.model.Derecho
 
 sealed class NavigationTab(val route: String, val title: String, val selectedIcon: ImageVector, val unselectedIcon: ImageVector) {
@@ -31,6 +33,8 @@ sealed class NavigationTab(val route: String, val title: String, val selectedIco
 @Composable
 fun MainContainer(
     userEmail: String = "",
+    userRepository: UserRepository,
+    derechoRepository: DerechoRepository,
     onLogout: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf<NavigationTab>(NavigationTab.Inicio) }
@@ -47,11 +51,14 @@ fun MainContainer(
         }
         .ifEmpty { "Usuario" }
 
-    // Estado global de la lista de derechos
-    var derechosList by remember { mutableStateOf(SampleData.derechosIniciales) }
+    // Estado local reactivo de la lista de derechos gestionada mediante el repositorio
+    var derechosList by remember { mutableStateOf(derechoRepository.getDerechos()) }
+
+    // Estado reactivo de foto de perfil
+    var profilePhotoState by remember { mutableStateOf<Bitmap?>(userRepository.getProfilePhoto(displayEmail)) }
 
     val favoritosList = remember(derechosList) {
-        derechosList.filter { it.isFavorito }
+        derechoRepository.getFavoritos()
     }
 
     Scaffold(
@@ -111,14 +118,26 @@ fun MainContainer(
                 }
 
                 selectedDerecho != null -> {
+                    val currentDerecho = selectedDerecho!!
+                    val currentNotePhoto = remember(currentDerecho.id) {
+                        derechoRepository.getNotePhoto(currentDerecho.id)
+                    }
+
                     DerechoDetailScreen(
-                        derecho = selectedDerecho!!,
-                        onBackClick = { selectedDerecho = null },
-                        onToggleFavorito = { updated ->
-                            derechosList = derechosList.map {
-                                if (it.id == updated.id) updated else it
+                        derecho = currentDerecho,
+                        notePhoto = currentNotePhoto,
+                        onSaveNotePhoto = { bitmap ->
+                            if (bitmap != null) {
+                                derechoRepository.saveNotePhoto(currentDerecho.id, bitmap)
                             }
-                            selectedDerecho = updated
+                        },
+                        onBackClick = { selectedDerecho = null },
+                        onToggleFavorito = { _ ->
+                            val updated = derechoRepository.toggleFavorito(currentDerecho.id)
+                            if (updated != null) {
+                                selectedDerecho = updated
+                                derechosList = derechoRepository.getDerechos()
+                            }
                         }
                     )
                 }
@@ -128,6 +147,7 @@ fun MainContainer(
                         NavigationTab.Inicio -> {
                             HomeScreen(
                                 userName = displayUserName,
+                                derechoRepository = derechoRepository,
                                 onSelectCategory = { _ ->
                                     selectedTab = NavigationTab.Catalogo
                                 },
@@ -139,9 +159,10 @@ fun MainContainer(
 
                         NavigationTab.Catalogo -> {
                             CatalogScreen(
+                                derechoRepository = derechoRepository,
                                 onSelectCategoria = { cat ->
-                                    val match = derechosList.firstOrNull { it.categoriaId == cat.id }
-                                        ?: derechosList.first()
+                                    val match = derechoRepository.getDerechosByCategoria(cat.id).firstOrNull()
+                                        ?: derechoRepository.getDerechos().first()
                                     selectedDerecho = match
                                 },
                                 onSelectDerecho = { derecho ->
@@ -163,6 +184,11 @@ fun MainContainer(
                             ProfileScreen(
                                 userName = displayUserName,
                                 userEmail = displayEmail,
+                                profilePhoto = profilePhotoState,
+                                onSaveProfilePhoto = { bitmap ->
+                                    userRepository.saveProfilePhoto(displayEmail, bitmap)
+                                    profilePhotoState = bitmap
+                                },
                                 onNavigateToFavorites = {
                                     selectedTab = NavigationTab.Favoritos
                                 },

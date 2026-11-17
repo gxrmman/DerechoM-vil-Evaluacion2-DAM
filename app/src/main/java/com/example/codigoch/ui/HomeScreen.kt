@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,7 +23,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.codigoch.data.SampleData
+
+
+import com.example.codigoch.data.repository.DerechoRepository
 import com.example.codigoch.model.CategoriaDerecho
 
 val AzulOscuro = Color(0xFF0F2646)
@@ -31,9 +34,12 @@ val FondoClaro = Color(0xFFF7F9FC)
 @Composable
 fun HomeScreen(
     userName: String = "Usuario",
+    derechoRepository: DerechoRepository,
     onSelectCategory: (CategoriaDerecho) -> Unit,
     onNavigateToCatalog: () -> Unit
 ) {
+    val categorias = remember { derechoRepository.getCategorias() }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -135,7 +141,6 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-
         Text(
             text = "Categorías",
             fontSize = 20.sp,
@@ -154,7 +159,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .height(300.dp)
         ) {
-            items(SampleData.categorias) { cat ->
+            items(categorias) { cat ->
                 CategoryGridItem(categoria = cat, onClick = { onSelectCategory(cat) })
             }
         }
