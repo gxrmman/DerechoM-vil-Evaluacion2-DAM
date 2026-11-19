@@ -1,5 +1,13 @@
 package com.example.codigoch.ui
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,14 +15,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,10 +38,37 @@ import com.example.codigoch.model.Derecho
 @Composable
 fun DerechoDetailScreen(
     derecho: Derecho,
+    notePhoto: Bitmap? = null,
+    onSaveNotePhoto: (Bitmap?) -> Unit = {},
     onBackClick: () -> Unit,
     onToggleFavorito: (Derecho) -> Unit
 ) {
+    val context = LocalContext.current
     var isFavorito by remember(derecho) { mutableStateOf(derecho.isFavorito) }
+    var currentNotePhoto by remember(notePhoto) { mutableStateOf(notePhoto) }
+
+    // Launcher para tomar foto con Cámara para el apunte
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: Bitmap? ->
+        bitmap?.let {
+            currentNotePhoto = it
+            onSaveNotePhoto(it)
+        }
+    }
+
+    // Launcher para Galería
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            val bitmap = uriToBitmap(context, it)
+            bitmap?.let { bmt ->
+                currentNotePhoto = bmt
+                onSaveNotePhoto(bmt)
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -176,6 +218,103 @@ fun DerechoDetailScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            // SECCIÓN DE FOTO / APUNTE DE ESTUDIO
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "📸 Foto de Apunte / Ley",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1E293B)
+                        )
+
+                        if (currentNotePhoto != null) {
+                            IconButton(onClick = {
+                                currentNotePhoto = null
+                                onSaveNotePhoto(null)
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Eliminar foto",
+                                    tint = Color(0xFFDC2626)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (currentNotePhoto != null) {
+                        Image(
+                            bitmap = currentNotePhoto!!.asImageBitmap(),
+                            contentDescription = "Foto de Apunte",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    } else {
+                        Text(
+                            text = "Puedes capturar o cargar una foto de tu código impreso, apunte o norma para estudio.",
+                            fontSize = 13.sp,
+                            color = Color(0xFF64748B)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        OutlinedButton(
+                            onClick = { cameraLauncher.launch(null) },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CameraAlt,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (currentNotePhoto == null) "Tomar Foto" else "Cambiar Foto",
+                                fontSize = 12.sp
+                            )
+                        }
+
+                        OutlinedButton(
+                            onClick = { galleryLauncher.launch("image/*") },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.PhotoLibrary,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Galería",
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         // Botón inferior Guardar en Favoritos
@@ -215,5 +354,20 @@ fun DerechoDetailScreen(
                 }
             }
         }
+    }
+}
+
+private fun uriToBitmap(context: android.content.Context, uri: Uri): Bitmap? {
+    return try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val source = ImageDecoder.createSource(context.contentResolver, uri)
+            ImageDecoder.decodeBitmap(source)
+        } else {
+            @Suppress("DEPRECATION")
+            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
 }

@@ -19,37 +19,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.codigoch.data.SampleData
+
+
+import com.example.codigoch.data.repository.DerechoRepository
 import com.example.codigoch.model.CategoriaDerecho
 import com.example.codigoch.model.Derecho
 
 @Composable
 fun CatalogScreen(
+    derechoRepository: DerechoRepository,
     onSelectCategoria: (CategoriaDerecho) -> Unit,
     onSelectDerecho: (Derecho) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
     val filteredCategorias = remember(searchQuery) {
-        if (searchQuery.isBlank()) {
-            SampleData.categorias
-        } else {
-            SampleData.categorias.filter {
-                it.nombre.contains(searchQuery, ignoreCase = true) ||
-                        it.descripcion.contains(searchQuery, ignoreCase = true)
-            }
-        }
+        derechoRepository.searchCategorias(searchQuery)
     }
 
     val filteredDerechos = remember(searchQuery) {
-        if (searchQuery.isBlank()) {
-            emptyList()
-        } else {
-            SampleData.derechosIniciales.filter {
-                it.titulo.contains(searchQuery, ignoreCase = true) ||
-                        it.descripcion.contains(searchQuery, ignoreCase = true)
-            }
-        }
+        derechoRepository.searchDerechos(searchQuery)
     }
 
     Column(
