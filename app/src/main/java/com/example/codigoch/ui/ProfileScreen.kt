@@ -1,12 +1,16 @@
 package com.example.codigoch.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,9 +62,34 @@ fun ProfileScreen(
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap: Bitmap? ->
-        bitmap?.let {
-            currentPhoto = it
-            onSaveProfilePhoto(it)
+        if (bitmap != null) {
+            currentPhoto = bitmap
+            onSaveProfilePhoto(bitmap)
+        } else {
+            Toast.makeText(context, "No se capturó la foto", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Launcher para solicitar permiso de cámara
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            cameraLauncher.launch(null)
+        } else {
+            Toast.makeText(context, "Se necesita permiso de cámara para tomar fotos", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    val openCamera = {
+        val permissionCheck = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA
+        )
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            cameraLauncher.launch(null)
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
@@ -165,6 +194,9 @@ fun ProfileScreen(
                     text = userEmail,
                     fontSize = 14.sp,
                     color = Color(0xFF64748B)
+
+
+
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -252,7 +284,7 @@ fun ProfileScreen(
                     OutlinedButton(
                         onClick = {
                             showPhotoOptionsDialog = false
-                            cameraLauncher.launch(null)
+                            openCamera()
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {

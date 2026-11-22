@@ -52,6 +52,10 @@ dependencies {
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
 
+    // Google Maps Compose & Play Services Maps
+    implementation("com.google.maps.android:maps-compose:6.1.2")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
