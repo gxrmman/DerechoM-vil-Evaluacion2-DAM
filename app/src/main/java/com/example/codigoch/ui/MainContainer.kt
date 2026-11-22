@@ -1,3 +1,4 @@
+
 package com.example.codigoch.ui
 
 import android.graphics.Bitmap
@@ -8,9 +9,11 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,6 +29,7 @@ import com.example.codigoch.model.Derecho
 sealed class NavigationTab(val route: String, val title: String, val selectedIcon: ImageVector, val unselectedIcon: ImageVector) {
     object Inicio : NavigationTab("inicio", "Inicio", Icons.Filled.Home, Icons.Outlined.Home)
     object Catalogo : NavigationTab("catalogo", "Catálogo", Icons.AutoMirrored.Filled.List, Icons.AutoMirrored.Outlined.List)
+    object Mapa : NavigationTab("mapa", "Mapa", Icons.Filled.Map, Icons.Outlined.Map)
     object Favoritos : NavigationTab("favoritos", "Favoritos", Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder)
     object Perfil : NavigationTab("perfil", "Perfil", Icons.Filled.Person, Icons.Outlined.Person)
 }
@@ -71,6 +75,7 @@ fun MainContainer(
                     val tabs = listOf(
                         NavigationTab.Inicio,
                         NavigationTab.Catalogo,
+                        NavigationTab.Mapa,
                         NavigationTab.Favoritos,
                         NavigationTab.Perfil
                     )
@@ -113,7 +118,11 @@ fun MainContainer(
             when {
                 showSupportScreen -> {
                     SupportScreen(
-                        onBackClick = { showSupportScreen = false }
+                        onBackClick = { showSupportScreen = false },
+                        onNavigateToMap = {
+                            showSupportScreen = false
+                            selectedTab = NavigationTab.Mapa
+                        }
                     )
                 }
 
@@ -167,6 +176,14 @@ fun MainContainer(
                                 },
                                 onSelectDerecho = { derecho ->
                                     selectedDerecho = derecho
+                                }
+                            )
+                        }
+
+                        NavigationTab.Mapa -> {
+                            MapScreen(
+                                onBackClick = {
+                                    selectedTab = NavigationTab.Inicio
                                 }
                             )
                         }

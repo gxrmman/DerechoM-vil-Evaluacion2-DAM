@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -62,7 +63,8 @@ val faqsList = listOf(
 
 @Composable
 fun SupportScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onNavigateToMap: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -179,6 +181,25 @@ fun SupportScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "Correo electrónico", fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = onNavigateToMap,
+                shape = RoundedCornerShape(24.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Map,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Ver Puntos de Atención en Mapa", fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(28.dp))
