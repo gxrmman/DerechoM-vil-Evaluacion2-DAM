@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Balanza de la justicia -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Base y poste central -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,78h28v5h-28z M52,32h4v46h-4z" />
+    <!-- Esfera superior -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,25m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    <!-- Viga horizontal -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M28,34h52v3h-52z" />
+    <!-- Cuerdas -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M32,37L23,57 M32,37L41,57 M76,37L67,57 M76,37L85,57" />
+    <!-- Platillos -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M22,57h20a10,10 0,0 1,-20 0z M66,57h20a10,10 0,0 1,-20 0z" />
+</vector>
