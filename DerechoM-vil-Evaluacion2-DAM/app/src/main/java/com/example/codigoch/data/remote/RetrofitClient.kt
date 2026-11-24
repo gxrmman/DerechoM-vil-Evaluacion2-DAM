@@ -6,7 +6,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 /** Crea una única instancia de Retrofit para toda la aplicación. */
 object RetrofitClient {
 
-    private const val URL_BASE = "https://jsonplaceholder.typicode.com/"
+    // URL del grupo de API de Xano (debe terminar en "/"), por ejemplo:
+    // "https://x8ki-letl-twmt.n7.xano.io/api:AbCdEfGh/"
+    private const val URL_BASE = "https://PEGAR-AQUI-TU-INSTANCIA.xano.io/api:PEGAR-AQUI-TU-GRUPO/"
 
     val apiService: ApiService by lazy {
         Retrofit.Builder()

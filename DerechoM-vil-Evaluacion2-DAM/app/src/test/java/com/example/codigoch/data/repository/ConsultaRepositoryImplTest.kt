@@ -22,10 +22,14 @@ class ConsultaRepositoryImplTest {
             return valor
         }
 
-        override suspend fun obtenerConsultas(usuarioId: Int) = responder(listOf(consulta))
+        override suspend fun obtenerConsultas() = responder(listOf(consulta, consulta.copy(id = 2, userId = 2)))
         override suspend fun obtenerConsulta(consultaId: Int) = responder(consulta)
-        override suspend fun obtenerRespuestas(consultaId: Int) =
-            responder(listOf(RespuestaDto(1, consultaId, "Respuesta", "a@b.cl", "Texto")))
+        override suspend fun obtenerRespuestas() = responder(
+            listOf(
+                RespuestaDto(1, 1, "Respuesta", "a@b.cl", "Texto"),
+                RespuestaDto(2, 7, "Otra", "c@d.cl", "Otro texto")
+            )
+        )
         override suspend fun obtenerOrientadores() = responder(listOf(OrientadorDto(1, "Ana", "ana@correo.cl")))
         override suspend fun crearConsulta(consulta: ConsultaDto) = responder(consulta.copy(id = 101))
         override suspend fun editarConsulta(consultaId: Int, consulta: ConsultaDto) = responder(consulta.copy(id = consultaId))
@@ -42,6 +46,20 @@ class ConsultaRepositoryImplTest {
 
         assertTrue(resultado.isSuccess)
         assertEquals(1, resultado.getOrThrow().size)
+    }
+
+    @Test
+    fun obtenerConsultas_filtraSoloLasDelUsuario() = runBlocking {
+        val resultado = ConsultaRepositoryImpl(FakeApiService()).obtenerConsultas(2)
+
+        assertEquals(listOf(2), resultado.getOrThrow().map { it.id })
+    }
+
+    @Test
+    fun obtenerRespuestas_filtraPorConsulta() = runBlocking {
+        val resultado = ConsultaRepositoryImpl(FakeApiService()).obtenerRespuestas(1)
+
+        assertEquals(listOf(1), resultado.getOrThrow().map { it.id })
     }
 
     @Test

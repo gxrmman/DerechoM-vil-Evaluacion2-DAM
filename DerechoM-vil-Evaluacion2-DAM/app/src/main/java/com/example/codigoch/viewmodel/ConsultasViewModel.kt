@@ -75,11 +75,7 @@ class ConsultasViewModel(
         viewModelScope.launch {
             repository.crearConsulta(ConsultaDto(userId = USUARIO_ID, title = titulo.trim(), body = descripcion.trim()))
                 .onSuccess { creada ->
-                    _uiState.update { estado ->
-                        // La API de pruebas siempre responde el mismo id, por eso se asegura que sea único en la lista
-                        val idUnico = maxOf(creada.id ?: 0, (estado.consultas.maxOfOrNull { it.id ?: 0 } ?: 0) + 1)
-                        estado.copy(consultas = listOf(creada.copy(id = idUnico)) + estado.consultas, mensaje = "Consulta enviada")
-                    }
+                    _uiState.update { it.copy(consultas = listOf(creada) + it.consultas, mensaje = "Consulta enviada") }
                 }
                 .onFailure { _uiState.update { it.copy(mensaje = "No se pudo enviar la consulta") } }
         }

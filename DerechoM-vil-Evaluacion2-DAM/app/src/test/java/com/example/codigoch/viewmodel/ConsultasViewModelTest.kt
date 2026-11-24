@@ -39,7 +39,7 @@ class ConsultasViewModelTest {
         override suspend fun obtenerOrientadores() = resultado(listOf(OrientadorDto(1, "Ana", "ana@correo.cl")))
         override suspend fun crearConsulta(consulta: ConsultaDto): Result<ConsultaDto> {
             llamadasACrear++
-            return resultado(consulta.copy(id = 101))
+            return resultado(consulta.copy(id = 100 + llamadasACrear))
         }
         override suspend fun editarConsulta(consultaId: Int, consulta: ConsultaDto) = resultado(consulta.copy(id = consultaId))
         override suspend fun eliminarConsulta(consultaId: Int) = resultado(Unit)

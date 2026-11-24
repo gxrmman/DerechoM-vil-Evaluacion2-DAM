@@ -5,7 +5,7 @@ import com.example.codigoch.data.remote.ConsultaDto
 import com.example.codigoch.data.remote.OrientadorDto
 import com.example.codigoch.data.remote.RespuestaDto
 
-/** Acceso a las consultas legales y orientadores que entrega la API externa. */
+/** Acceso a las consultas legales, respuestas y orientadores que entrega la API de Xano. */
 interface ConsultaRepository {
     suspend fun obtenerConsultas(usuarioId: Int): Result<List<ConsultaDto>>
     suspend fun obtenerConsulta(consultaId: Int): Result<ConsultaDto>
@@ -21,13 +21,13 @@ class ConsultaRepositoryImpl(
 ) : ConsultaRepository {
 
     override suspend fun obtenerConsultas(usuarioId: Int) =
-        runCatching { apiService.obtenerConsultas(usuarioId) }
+        runCatching { apiService.obtenerConsultas().filter { it.userId == usuarioId }.sortedByDescending { it.id } }
 
     override suspend fun obtenerConsulta(consultaId: Int) =
         runCatching { apiService.obtenerConsulta(consultaId) }
 
     override suspend fun obtenerRespuestas(consultaId: Int) =
-        runCatching { apiService.obtenerRespuestas(consultaId) }
+        runCatching { apiService.obtenerRespuestas().filter { it.consultaId == consultaId } }
 
     override suspend fun obtenerOrientadores() =
         runCatching { apiService.obtenerOrientadores() }

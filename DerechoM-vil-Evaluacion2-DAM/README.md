@@ -41,20 +41,20 @@ Flujo de las consultas: `ConsultasScreen` → `ConsultasViewModel` → `Consulta
 
 ## 4. Endpoints utilizados
 
-API externa: `https://jsonplaceholder.typicode.com/` (consumida con Retrofit + Gson).
+API propia creada en [Xano](https://www.xano.com) con base de datos (tablas `consulta`, `respuesta` y `orientador`), consumida desde la app con Retrofit + Gson.
+URL base: `https://(instancia).xano.io/api:(grupo)/`
 
 | # | Método | Endpoint | Uso en la app |
 |---|--------|----------|---------------|
-| 1 | GET | `/posts?userId=1` | Lista las consultas del usuario |
-| 2 | GET | `/posts/{id}` | Detalle de una consulta |
-| 3 | GET | `/posts/{id}/comments` | Respuestas de una consulta |
-| 4 | GET | `/users` | Lista de orientadores legales |
-| 5 | POST | `/posts` | Crear una consulta |
-| 6 | PUT | `/posts/{id}` | Editar una consulta |
-| 7 | DELETE | `/posts/{id}` | Eliminar una consulta |
+| 1 | GET | `/consulta` | Lista las consultas del usuario |
+| 2 | GET | `/consulta/{id}` | Detalle de una consulta |
+| 3 | GET | `/respuesta` | Respuestas de las consultas |
+| 4 | GET | `/orientador` | Lista de orientadores legales |
+| 5 | POST | `/consulta` | Crear una consulta |
+| 6 | PATCH | `/consulta/{id}` | Editar una consulta |
+| 7 | DELETE | `/consulta/{id}` | Eliminar una consulta |
 
-> JSONPlaceholder es una API de pruebas: responde correctamente pero no guarda los cambios en el servidor.
-> Por eso la lista de consultas se actualiza en la app con la respuesta de cada operación.
+Si la API no está disponible, la app muestra un mensaje de error de conexión.
 
 ## 5. Pasos para ejecutar
 

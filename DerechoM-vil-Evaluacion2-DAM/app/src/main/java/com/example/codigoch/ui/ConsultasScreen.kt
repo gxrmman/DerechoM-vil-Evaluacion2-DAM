@@ -323,7 +323,7 @@ private fun ListaOrientadores(orientadores: List<OrientadorDto>) {
                         fontWeight = FontWeight.Bold,
                         color = ColorTextoTitulo
                     )
-                    orientador.company?.name?.let {
+                    orientador.institucion?.let {
                         Text(text = it, fontSize = 12.sp, color = ColorPrimario)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
